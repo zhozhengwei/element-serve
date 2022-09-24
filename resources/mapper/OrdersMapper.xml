@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.mapper.OrdersMapper">
+
+    <resultMap type="com.boot.entity.Orders" id="OrdersMap">
+        <result property="orderId" column="orderId" jdbcType="INTEGER"/>
+        <result property="userId" column="userId" jdbcType="INTEGER"/>
+        <result property="businessId" column="businessId" jdbcType="INTEGER"/>
+        <result property="orderDate" column="orderDate" jdbcType="VARCHAR"/>
+        <result property="orderTotal" column="orderTotal" jdbcType="NUMERIC"/>
+        <result property="daId" column="daId" jdbcType="INTEGER"/>
+        <result property="orderState" column="orderState" jdbcType="INTEGER"/>
+<!--        多对一-->
+        <association property="business" javaType="Business" select="com.boot.mapper.BusinessMapper.getBusinessById" column="businessId"></association>
+<!--        一对多-->
+        <collection property="odList" ofType="OrderDetailet" select="com.boot.mapper.OrderDetailetMapper.listOrderDateiletByOrderId" column="orderId"></collection>
+    </resultMap>
+
+    <resultMap type="com.boot.entity.Orders" id="Orders">
+        <result property="orderId" column="orderId" jdbcType="INTEGER"/>
+        <result property="userId" column="userId" jdbcType="INTEGER"/>
+        <result property="businessId" column="businessId" jdbcType="INTEGER"/>
+        <result property="orderDate" column="orderDate" jdbcType="VARCHAR"/>
+        <result property="orderTotal" column="orderTotal" jdbcType="NUMERIC"/>
+        <result property="daId" column="daId" jdbcType="INTEGER"/>
+        <result property="orderState" column="orderState" jdbcType="INTEGER"/>
+        <!--        多对一-->
+        <association property="business" javaType="Business" select="com.boot.mapper.BusinessMapper.getBusinessById" column="businessId"></association>
+
+        <association property="message" javaType="Message" select="com.boot.mapper.MessageMapper.queryByOrderId" column="orderId"></association>
+        <!--        一对多-->
+        <collection property="odList" ofType="OrderDetailet" select="com.boot.mapper.OrderDetailetMapper.listOrderDateiletByOrderId" column="orderId"></collection>
+    </resultMap>
+
+    <select id="getOrderById" parameterType="Long" resultMap="OrdersMap">
+        select orderId,
+               userId,
+               businessId,
+               orderDate,
+               orderTotal,
+               daId,
+               orderState
+        from orders where orderId = #{orderId}
+    </select>
+
+    <select id="listOrdersByUserId" parameterType="Long" resultMap="OrdersMap">
+        select orderId,
+               userId,
+               businessId,
+               orderDate,
+               orderTotal,
+               daId,
+               orderState
+        from orders
+        where userId = #{userId}
+    </select>
+
+    <select id="listOrdersMessageByUserId" parameterType="Long" resultMap="Orders">
+        select orderId,
+               userId,
+               businessId,
+               orderDate,
+               orderTotal,
+               daId,
+               orderState
+        from orders
+        where userId = #{userId}
+<!--        <if test="userId != null">-->
+<!--            userId = #{userId},-->
+<!--        </if>-->
+    </select>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="OrdersMap">
+        select orderId,
+               userId,
+               businessId,
+               orderDate,
+               orderTotal,
+               daId,
+               orderState
+        from orders
+        where orderId = #{orderId}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="OrdersMap">
+        select
+        orderId, userId, businessId, orderDate, orderTotal, daId, orderState
+        from orders
+        <where>
+            <if test="orderId != null">
+                and orderId = #{orderId}
+            </if>
+            <if test="userId != null">
+                and userId = #{userId}
+            </if>
+            <if test="businessId != null">
+                and businessId = #{businessId}
+            </if>
+            <if test="orderDate != null and orderDate != ''">
+                and orderDate = #{orderDate}
+            </if>
+            <if test="orderTotal != null">
+                and orderTotal = #{orderTotal}
+            </if>
+            <if test="daId != null">
+                and daId = #{daId}
+            </if>
+            <if test="orderState != null">
+                and orderState = #{orderState}
+            </if>
+        </where>
+        limit #{pageable.offset}, #{pageable.pageSize}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from orders
+        <where>
+            <if test="orderId != null">
+                and orderId = #{orderId}
+            </if>
+            <if test="userId != null">
+                and userId = #{userId}
+            </if>
+            <if test="businessId != null">
+                and businessId = #{businessId}
+            </if>
+            <if test="orderDate != null and orderDate != ''">
+                and orderDate = #{orderDate}
+            </if>
+            <if test="orderTotal != null">
+                and orderTotal = #{orderTotal}
+            </if>
+            <if test="daId != null">
+                and daId = #{daId}
+            </if>
+            <if test="orderState != null">
+                and orderState = #{orderState}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="orderId" useGeneratedKeys="true">
+        insert into orders(userId, businessId, orderDate, orderTotal, daId, orderState)
+        values (#{userId}, #{businessId}, #{orderDate}, #{orderTotal}, #{daId}, #{orderState})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="orderId" useGeneratedKeys="true">
+        insert into orders(userId, businessId, orderDate, orderTotal, daId, orderState)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.userid}, #{entity.businessid}, #{entity.orderdate}, #{entity.ordertotal}, #{entity.daid},
+            #{entity.orderstate})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="orderId" useGeneratedKeys="true">
+        insert into orders(userId, businessId, orderDate, orderTotal, daId, orderState)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.userid}, #{entity.businessid}, #{entity.orderdate}, #{entity.ordertotal}, #{entity.daid},
+            #{entity.orderstate})
+        </foreach>
+        on duplicate key update
+        userId = values(userId),
+        businessId = values(businessId),
+        orderDate = values(orderDate),
+        orderTotal = values(orderTotal),
+        daId = values(daId),
+        orderState = values(orderState)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="updateOrderById">
+        update orders
+        <set>
+            <if test="userId != null">
+                userId = #{userId},
+            </if>
+            <if test="businessId != null">
+                businessId = #{businessId},
+            </if>
+            <if test="orderDate != null and orderDate != ''">
+                orderDate = #{orderDate},
+            </if>
+            <if test="orderTotal != null">
+                orderTotal = #{orderTotal},
+            </if>
+            <if test="daId != null">
+                daId = #{daId},
+            </if>
+            <if test="orderState != null">
+                orderState = #{orderState},
+            </if>
+        </set>
+        where orderId = #{orderId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from orders
+        where orderId = #{orderId}
+    </delete>
+
+</mapper>
+

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.mapper.OrderDetailetMapper">
+
+    <resultMap type="com.boot.entity.OrderDetailet" id="OrderdetailetMap">
+        <result property="odId" column="odId" jdbcType="INTEGER"/>
+        <result property="orderId" column="orderId" jdbcType="INTEGER"/>
+        <result property="foodId" column="foodId" jdbcType="INTEGER"/>
+        <result property="quantity" column="quantity" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="OrderdetailetMap">
+        select odId,
+               orderId,
+               foodId,
+               quantity
+        from orderdetailet
+        where odId = #{odid}
+    </select>
+
+    <insert id="saveOrderDetailet" parameterType="OrderDetailet">
+        insert into orderdetailet (orderId, foodId, quantity) values
+        <foreach collection="list" item="od" separator=",">
+            (#{od.orderId}, #{od.foodId}, #{od.quantity})
+        </foreach>
+    </insert>
+
+    <resultMap id="OrderDetailetAndFood" type="OrderDetailet">
+        <id property="odId" column="odId"></id>
+        <result property="orderId" column="orderId" jdbcType="INTEGER"/>
+        <result property="foodId" column="foodId" jdbcType="INTEGER"/>
+        <result property="quantity" column="quantity" jdbcType="INTEGER"/>
+<!--      多对一配置  -->
+        <association property="food" javaType="Food" select="com.boot.mapper.FoodMapper.getFoodById" column="foodId"></association>
+    </resultMap>
+    <select id="listOrderDateiletByOrderId" parameterType="Long" resultMap="OrderDetailetAndFood">
+        select * from orderdetailet where orderId = #{orderId}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="OrderdetailetMap">
+        select
+        odId, orderId, foodId, quantity
+        from orderdetailet
+        <where>
+            <if test="odid != null">
+                and odId = #{odid}
+            </if>
+            <if test="orderid != null">
+                and orderId = #{orderid}
+            </if>
+            <if test="foodid != null">
+                and foodId = #{foodid}
+            </if>
+            <if test="quantity != null">
+                and quantity = #{quantity}
+            </if>
+        </where>
+        limit #{pageable.offset}, #{pageable.pageSize}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from orderdetailet
+        <where>
+            <if test="odid != null">
+                and odId = #{odid}
+            </if>
+            <if test="orderid != null">
+                and orderId = #{orderid}
+            </if>
+            <if test="foodid != null">
+                and foodId = #{foodid}
+            </if>
+            <if test="quantity != null">
+                and quantity = #{quantity}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="odid" useGeneratedKeys="true">
+        insert into orderdetailet(orderId, foodId, quantity)
+        values (#{orderid}, #{foodid}, #{quantity})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="odid" useGeneratedKeys="true">
+        insert into orderdetailet(orderId, foodId, quantity)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.orderid}, #{entity.foodid}, #{entity.quantity})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="odid" useGeneratedKeys="true">
+        insert into orderdetailet(orderId, foodId, quantity)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.orderid}, #{entity.foodid}, #{entity.quantity})
+        </foreach>
+        on duplicate key update
+        orderId = values(orderId),
+        foodId = values(foodId),
+        quantity = values(quantity)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update orderdetailet
+        <set>
+            <if test="orderid != null">
+                orderId = #{orderid},
+            </if>
+            <if test="foodid != null">
+                foodId = #{foodid},
+            </if>
+            <if test="quantity != null">
+                quantity = #{quantity},
+            </if>
+        </set>
+        where odId = #{odid}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from orderdetailet
+        where odId = #{odid}
+    </delete>
+
+
+
+</mapper>
+

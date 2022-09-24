@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.mapper.FoodBusinessClassifyMapper">
+<!--    <resultMap id="FoodBusinessClassifyResultMap" type="com.boot.entity.FoodBusinessClassify">-->
+<!--        <result property="foodClassifyId" column="foodClassifyId"></result>-->
+<!--        <result property="foodId" column="foodId"></result>-->
+<!--        <collection property="foodList" ofType="Food" select="com.boot.mapper.FoodMapper.getFoodById" column="foodId"></collection>-->
+<!--    </resultMap>-->
+
+    <resultMap id="FoodBusinessClassifyResult" type="com.boot.entity.FoodBusinessClassify">
+        <result property="foodClassifyId" column="foodClassifyId"></result>
+        <result property="foodId" column="foodId"></result>
+        <association property="food" javaType="Food" select="com.boot.mapper.FoodMapper.getFoodById" column="foodId"></association>
+    </resultMap>
+    <select id="getFoodClassifyId" parameterType="Long" resultMap="FoodBusinessClassifyResult">
+        SELECT * FROM food_business_classify WHERE foodClassifyId = #{foodClassifyId}
+    </select>
+
+    <select id="getFoodByClassifyId" parameterType="Long" resultMap="FoodBusinessClassifyResult">
+        select * from food_business_classify where foodClassifyId = #{foodClassifyId}
+    </select>
+</mapper>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.mapper.BusinessMapper">
+<!--        <select id="listBusiness" resultType="Business" >-->
+<!--            SELECT businessId,businessName,businessAddress,businessExplain,businessImg,categoryId,starPrice,deliveryPrice,remarks FROM business-->
+<!--        </select>-->
+<!--    ############################ 分步查询 ################### 速度更快 ###############-->
+        <resultMap id="Food" type="com.boot.entity.Food">
+            <id column="foodId" property="foodId"/>
+            <result column="foodName" property="foodName"/>
+            <result column="foodDescribe" property="foodDescribe"/>
+            <result column="foodPrice" property="foodPrice"/>
+            <result column="businessId" property="businessId"/>
+        </resultMap>
+        <resultMap id="BusinessFood" type="com.boot.entity.Business">
+            <id column = "businessId" property="businessId"/>
+            <result column = "businessName" property="businessName"/>
+            <result column = "businessAddress" property="businessAddress"/>
+            <result column = "businessExplain" property="businessExplain"/>
+            <result column = "businessImg" property="businessImg"/>
+            <result column = "categoryId" property="categoryId"/>
+            <result column = "starPrice" property="starPrice"/>
+            <result column = "deliveryPrice" property="deliveryPrice"/>
+            <result column = "remarks" property="remarks"/>
+            <collection property="foodList" ofType="Food" column="businessId" select="foodList"/>
+        </resultMap>
+    <select id="findBusinessFood" parameterType="Integer" resultMap="BusinessFood">
+        SELECT businessId,businessName,businessAddress,businessExplain,businessImg,categoryId,starPrice,deliveryPrice,remarks FROM business where businessId=#{businessId}
+    </select>
+    <select id="foodList" parameterType="Integer" resultMap="Food">
+        SELECT foodId,foodName,foodDescribe,foodImage,foodPrice from food where businessId = #{businessId}
+    </select>
+<!--    <resultMap id="BusinessFood" type="com.boot.entity.Business">-->
+<!--        <id property="businessId" column = "businessId" />-->
+<!--        <result  property="businessName" column = "businessName"/>-->
+<!--        <result property="businessAddress" column = "businessAddress" />-->
+<!--        <result  property="businessExplain" column = "businessExplain"/>-->
+<!--        <result  property="businessImg" column = "businessImg"/>-->
+<!--        <result property="categoryId" column = "categoryId" />-->
+<!--        <result  property="starPrice" column = "starPrice"/>-->
+<!--        <result property="deliveryPrice" column = "deliveryPrice" />-->
+<!--        <result property="remarks" column = "remarks" />-->
+<!--&lt;!&ndash;         一对多 &ndash;&gt;-->
+<!--        <collection property="foodList" ofType="com.boot.entity.Food">-->
+<!--            <id column="foodId" property="foodId"/>-->
+<!--            <result column="foodName" property="foodName"/>-->
+<!--            <result column="foodexPlain" property="foodexPlain"/>-->
+<!--            <result column="foodPrice" property="foodPrice"/>-->
+<!--            <result column="businessId" property="businessId"/>-->
+<!--            <result column="remarks" property="remarks"/>-->
+<!--        </collection>-->
+<!--    </resultMap>-->
+
+<!--    <select id="findBusinessFood" parameterType="Integer" resultMap="BusinessFood">-->
+<!--        SELECT d.*,e.* FROM business d LEFT JOIN food e ON e.businessId = d.businessId where e.businessId = #{businessId}-->
+<!--    </select>-->
+</mapper>

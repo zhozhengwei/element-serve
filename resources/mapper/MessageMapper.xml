@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.mapper.MessageMapper">
+
+    <resultMap type="com.boot.entity.Message" id="MessageMap">
+        <id property="mId" column="mId" jdbcType="INTEGER"/>
+        <result property="orderId" column="orderId" jdbcType="INTEGER"/>
+        <result property="userId" column="userId" jdbcType="INTEGER"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="MessageMap">
+        select mId,
+               orderId,
+               userId,
+               status
+        from message
+        where mId = #{mId}
+    </select>
+
+    <!--查询单个-->
+    <select id="queryByOrderId" resultMap="MessageMap">
+        select mId,
+               orderId,
+               userId,
+               status
+        from message
+        where orderId = #{orderId}
+    </select>
+
+    <!--查询单个-->
+    <select id="queryByUserId" resultMap="MessageMap">
+        select mId,
+               orderId,
+               userId,
+               status
+        from message
+        where userId = #{userId}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="MessageMap">
+        select
+        mId, orderId, userId, status
+        from message
+        <where>
+            <if test="mId != null">
+                and mId = #{mId}
+            </if>
+            <if test="orderId != null">
+                and orderId = #{orderId}
+            </if>
+            <if test="userId != null">
+                and userId = #{userId}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+        limit #{pageable.offset}, #{pageable.pageSize}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from message
+        <where>
+            <if test="mId != null">
+                and mId = #{mId}
+            </if>
+            <if test="orderId != null">
+                and orderId = #{orderId}
+            </if>
+            <if test="userId != null">
+                and userId = #{userId}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="mId" useGeneratedKeys="true">
+        insert into message(orderId, userId, status)
+        values (#{orderId}, #{userId}, #{status})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="mId" useGeneratedKeys="true">
+        insert into message(orderId, userId, status)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.orderid}, #{entity.userid}, #{entity.status})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="mId" useGeneratedKeys="true">
+        insert into message(orderId, userId, status)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.orderid}, #{entity.userid}, #{entity.status})
+        </foreach>
+        on duplicate key update
+        orderId = values(orderId),
+        userId = values(userId),
+        status = values(status)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update message
+        <set>
+            <if test="orderId != null">
+                orderId = #{orderId},
+            </if>
+            <if test="userId != null">
+                userId = #{userId},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+        </set>
+        where mId = #{mId}
+    </update>
+
+    <!--通过主键修改数据-->
+    <update id="updateOrderById" parameterType="Message">
+        update message
+        <set>
+            <if test="orderId != null">
+                orderId = #{orderId},
+            </if>
+            <if test="userId != null">
+                userId = #{userId},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+        </set>
+        where orderId = #{orderId}
+    </update>
+
+    <!--通过主键修改数据-->
+    <update id="updateUserById" parameterType="Message">
+        update message
+        <set>
+            <if test="orderId != null">
+                orderId = #{orderId},
+            </if>
+            <if test="userId != null">
+                userId = #{userId},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+        </set>
+        where userId = #{userId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from message
+        where mId = #{mId}
+    </delete>
+
+</mapper>
+

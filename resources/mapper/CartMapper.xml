@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.mapper.CartMapper">
+    <!-- 自定义返回结果 resultMap 包括:购物车、食物、商家信息-->
+    <resultMap id="cartResultMap" type="Cart">
+        <id property="cartId" column="cartId"></id>
+        <result property="foodId" column="foodId"></result>
+        <result property="businessId" column="businessId"></result>
+        <result property="userId" column="userId"></result>
+        <result property="quantity" column="quantity"></result>
+
+        <!--多对一：所属食品-->
+        <association property="food" javaType="Food" select="com.boot.mapper.FoodMapper.getFoodById" column="foodId"></association>
+        <!-- 多对一: 所属商家-->
+        <association property="business" javaType="Business" select="com.boot.mapper.BusinessMapper.getBusinessById" column="businessId"></association>
+    </resultMap>
+    <!-- listCart方法的查询-->
+    <select id="listCart" parameterType="Cart" resultMap="cartResultMap">
+        select * from cart
+        <where>
+            userId=#{userId}
+            <if test="businessId!=null and businessId!=''"> <!--如果传递的参数有商家编号，那么就加上商家编号的条件 -->
+                and businessId=#{businessId}
+            </if>
+        </where>
+    </select>
+
+    <!--getUserId-->
+    <select id="getUserId" parameterType="Cart" resultMap="cartResultMap">
+        select * from cart where userId = #{userId}
+    </select>
+
+
+    <!--删除购物车-->
+    <delete id="removeCart" parameterType="Cart">
+        delete from cart
+        <where>
+            userId=#{userId} and businessId=#{businessId}
+        </where>
+        <if test="foodId!=null and foodId!=''">
+            and foodId=#{foodId}
+        </if>
+    </delete>
+
+
+</mapper>

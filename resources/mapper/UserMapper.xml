@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.mapper.UserMapper">
+    <select id="findUerAll" resultType="com.boot.entity.ElmUser">
+        select *
+        from user
+    </select>
+
+    <update id="updateUserImage" parameterType="ElmUser">
+        update user
+        <set>
+            <if test="password!=null">
+                password = #{password},
+            </if>
+            <if test="username!=null">
+                username = #{username},
+            </if>
+            <if test="userSex!=null">
+                userSex = #{userSex},
+            </if>
+            <if test="userImg!=null">
+                userImg = #{userImg},
+            </if>
+            <if test="delTag!=null">
+                delTag = #{delTag}
+            </if>
+        </set>
+        where userId = #{userId}
+    </update>
+</mapper>
